@@ -6,6 +6,7 @@
 	version="1.0">
 	
 	<persistence-unit name="springappPU" transaction-type="RESOURCE_LOCAL">
+		<class>com.companyname.springapp.domain.Product</class>
 		<properties>
             <property name="hibernate.dialect"
                       value="org.hibernate.dialect.MySQLDialect"/>
