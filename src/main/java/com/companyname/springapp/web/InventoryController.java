@@ -23,6 +23,7 @@ public class InventoryController {
 
     protected final Log logger = LogFactory.getLog(getClass());
 
+    // tells the application context to inject an instance of productManager here
     @Autowired
     private ProductManager productManager;
     
