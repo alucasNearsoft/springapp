@@ -1,68 +1,75 @@
 <%@ include file="/WEB-INF/views/include.jsp" %>
 <!DOCTYPE html>
 
-<html ng-app>
+<html ng-app="myapp">
   <head><title><fmt:message key="title"/></title>
+  <link rel="stylesheet" href="css/app.css">
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular-resource.min.js"></script>
+  <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+  <script src="http://firebase.github.io/angularFire/angularFire.js"></script>
   <script type="text/javascript">
-  function productsController($scope) {
-	  //$scope.products = <c:out value="${model.products}"/>;
-	  //$scope.products = [Description: Lamp;Price: 9.98, Description: Table;Price: 129.87, Description: Chair;Price: 39.35]; // output from / salida de : <c:out value="${model.products}"/>
-	  //$scope.products = [{Description: "Lamp",Price : 9.98},{Description: "Table",Price: 129.87},{Description: "Chair",Price: 39.35}];  // working format / formato que funciona
-	//  $scope.products = [ 
-//	                       <c:forEach var="product" items="${model.products}">
-//	                       {
-//	                       description : "<c:out value="${product.description}" />",
-//	                       price : <c:out value="${product.price}" />
-//	                            },
-//	                       </c:forEach>
-//	                        ];
-	    $scope.products = ${model.productsJson}; // JSP tag to get the model / tag de JSP para recibir info. del modelo
-        uid = $scope.products.length + 1; // new element might have this id / id de posible nuevo elem.
+  // Add the module firebase as a dependency / Incluir "firebase" como dependencia
+  var myapp = angular.module('myapp', ['firebase']);
 
-        $scope.saveProduct = function() {
-         
-          if($scope.newproduct.id == null) {
-            //if this is new, add it in array
-            $scope.newproduct.id = uid++;
-            $scope.products.push($scope.newproduct);
-          } else {
-            //for existing element, find this using id
-            //and update it.
-            for(i in $scope.products) {
-              if($scope.products[i].id == $scope.newproduct.id) {
-                $scope.products[i] = $scope.newproduct;
-              }
+  // Service dependency of the controller / "servicio" para el controlador
+  myapp.controller('productsController', ['$scope', 'angularFire', 
+  function productsController($scope, angularFire) {
+      //$scope.products = ${model.productsJson}; // JSP tag to get the model / tag de JSP para recibir info. del modelo
+      
+      // Bind a Firebase reference to any model (products) in $scope / Asocia una referencia de tipo Firebase al modelo (products) en $scope
+      var ref = new Firebase('https://springappangular.firebaseio.com/products');
+		angularFire(ref, $scope, 'products');
+
+	  if ($scope.products) {
+        uid = $scope.products.length + 1; // new element might have this id / id de posible nuevo elem.
+	  } else {
+		uid = 0;
+      }
+
+      $scope.saveProduct = function() {
+       
+        if($scope.newproduct.id == null) {
+          //if this is new, add it in array
+          $scope.newproduct.id = uid++;
+          $scope.products.push($scope.newproduct);
+        } else {
+          //for existing element, find this using id
+          //and update it.
+          for(i in $scope.products) {
+            if($scope.products[i].id == $scope.newproduct.id) {
+              $scope.products[i] = $scope.newproduct;
             }
           }
-         
-          //clear the add product form
-          $scope.newproduct = {};
-        };
-
-        $scope.remove = function(id) {
-            
-            //search product with given id and delete it
-            for(i in $scope.products) {
-                if($scope.products[i].id == id) {
-                    $scope.products.splice(i,1);
-                    $scope.newproduct = {};
-                }
-            }
-        };
-
-        $scope.edit = function(id) { 
-        	//search product with given id and update it
-            for(i in $scope.products) {
-                if($scope.products[i].id == id) {
-                    //we use angular.copy() method to create 
-                    //copy of originial object
-                    $scope.newproduct = angular.copy($scope.products[i]);
-                }
-            }
-        };
+        }
         
-  };
+        //clear the add product form
+        $scope.newproduct = {};
+      }
+
+      $scope.remove = function(id) {
+          
+        //search product with given id and delete it
+        for(i in $scope.products) {
+          if($scope.products[i].id == id) {
+            $scope.products.splice(i,1);
+            $scope.newproduct = {};
+          }
+        }
+      }
+
+      $scope.edit = function(id) { 
+      	//search product with given id and update it
+        for(i in $scope.products) {
+          if($scope.products[i].id == id) {
+            //we use angular.copy() method to create 
+            //copy of original object
+            $scope.newproduct = angular.copy($scope.products[i]);
+          }
+        }
+      };
+  }
+  ]);
   </script>
 
   </head>
@@ -78,14 +85,14 @@
     -->
     <!-- Use AngularJS / Uso de AngularJS -->
     <div ng-controller="productsController">
-    <form >
+     <form>
       <label>Product</label> 
-        <input type="text" name="description" ng-model="newproduct.description"/>
+      <input type="text" name="description" ng-model="newproduct.description"/>
       <label>Price</label> 
-        <input type="text" name="price" ng-model="newproduct.price"/>
-      <input type="hidden" ng-model="newproduct.id" />
+      <input type="text" name="price" ng-model="newproduct.price"/>
+      <input type="hidden" ng-model="newproduct.id"/>
       <input type="button" value="Save" ng-click="saveProduct()" />
-    </form>
+     </form>
      <table>
       <thead>
        <tr>

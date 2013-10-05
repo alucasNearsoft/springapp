@@ -15,10 +15,14 @@
        </bean>
 
        <!-- Scans the classpath of this application for @Components to deploy as beans -->
+       <context:annotation-config />
        <context:component-scan base-package="com.companyname.springapp.web" />
 
        <!-- Configures the @Controller programming model -->
        <mvc:annotation-driven/>
+       
+       <!-- Enable folder to access the css file -->
+       <mvc:resources mapping="/css/**" location="/css/" />
        
        <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
          <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
